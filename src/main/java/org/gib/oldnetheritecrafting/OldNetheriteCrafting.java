@@ -2,6 +2,7 @@ package org.gib.oldnetheritecrafting;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -84,17 +85,28 @@ public class OldNetheriteCrafting extends JavaPlugin implements Listener {
                 if (playerInventory.firstEmpty() >= 0) {
                     playerInventory.addItem(resultItem);
 
-                    // Remove the netherite ingot and original diamond item from the table
+                    // Remove the original items from the smithing table
                     Inventory smithingInventory = event.getClickedInventory();
-                    smithingInventory.setItem(1, null); // Remove original diamond item
-                    smithingInventory.setItem(2, null); // Remove netherite ingot
+                    smithingInventory.setItem(1, null); // Remove the base item
+                    smithingInventory.setItem(2, null); // Remove the netherite ingot
+
+                    // Deduct one netherite ingot from the player's inventory
+                    Player player = (Player) event.getWhoClicked();
+                    ItemStack netheriteIngot = new ItemStack(Material.NETHERITE_INGOT, 1);
+                    player.getInventory().removeItem(netheriteIngot);
+                }
+            }
+        } else if (event.getSlotType() == org.bukkit.event.inventory.InventoryType.SlotType.CRAFTING) {
+            ItemStack clickedItem = event.getCurrentItem();
+            if (clickedItem != null && clickedItem.getType() != Material.AIR) {
+                // Prevent adding tools to the other slot of the smithing table
+                if (event.getSlot() == 2) {
+                    // Cancel the event if the player tries to add more than one netherite ingot
+                    if (clickedItem.getAmount() > 1) {
+                        event.setCancelled(true);
+                    }
                 }
             }
         }
     }
 }
-
-
-
-
-
