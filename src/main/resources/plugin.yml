@@ -1,0 +1,4 @@
+name: OldNetheriteCrafting
+version: '${project.version}'
+main: org.gib.oldnetheritecrafting.OldNetheriteCrafting
+api-version: '1.20'
